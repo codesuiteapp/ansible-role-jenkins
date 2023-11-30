@@ -2,21 +2,20 @@
 image_registry_server: "ghcr.io/codesuiteapp"
 jenkins_image: "jenkins-docker"
 jenkins_ver: "latest"
-docker_compose_bin: "docker-compose"
+jenkins_port: 9753
 
-app_home_dir: /app/docker
-app_data_dir: /appdata
-nexus_data: "{{ app_data_dir }}/m2/repository"
-create_user: false
-adm_user: "appadm"
-adm_group: "appadm"
-adm_uid: "1000"
-passwd_adm_user: "__your_passwd_"
+docker_type: ghcr.io
+docker_compose_bin: "docker-compose"
 use_dkr_net: false
 dkr_network: devops_net
 use_extra_hosts: false
 add_etc_host: "10.11.22.10   devops.com"
-docker_type: ghcr.io
-dkr_username: "__your_user__"
-dkr_passwd: "__your_token__"
-jenkins_port: 9753
+
+app_home_dir: /app/docker
+app_data_dir: /appdata
+nexus_data: "{{ app_data_dir }}/m2/repository"
+
+create_user: false
+adm_user: "appadm"
+adm_group: "appadm"
+adm_uid: "1000"
