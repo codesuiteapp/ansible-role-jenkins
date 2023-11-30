@@ -1,4 +1,0 @@
-dependencies:
-  - name: codesuiteapp.user
-    src: https://github.com/codesuiteapp/ansible-role-user.git
-    version: main
