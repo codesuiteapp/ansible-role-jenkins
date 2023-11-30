@@ -1,0 +1,4 @@
+dependencies:
+  - name: user
+    src: git+https://github.com/codesuiteapp/ansible-role-user.git
+    version: main

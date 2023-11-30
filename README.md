@@ -20,10 +20,10 @@ Requires `docker` to be installed on the server.
   connection: local
 
 vars:
-    today: "{{ lookup('pipe', 'date +\"%Y%m%d\"') }}"
-    dkr_username: "_your_username_"
-    dkr_passwd: "_p@ssw0rd1"
-    passwd_adm_user: "P@ssw0rd1"
+  today: "{{ lookup('pipe', 'date +\"%Y%m%d\"') }}"
+  dkr_username: "_your_username_"
+  dkr_passwd: "_p@ssw0rd1"
+  passwd_adm_user: "P@ssw0rd1"
 
   # vars_files:
   #   - "aval_vars.yml"

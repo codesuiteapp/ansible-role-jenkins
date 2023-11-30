@@ -1,6 +1,7 @@
 ---
 - name: Create User
-  include_tasks: "user.yml"
+  include_role:
+    name: "codesuiteapp.user"
 
 - name: Creates directory
   ansible.builtin.file:
