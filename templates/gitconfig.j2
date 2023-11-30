@@ -1,0 +1,162 @@
+[user]
+    name = {{ jenkins_git_user }}
+    email = {{ jenkins_git_email }}
+
+[core]
+    autocrlf = input
+    pager = delta
+    quotepath = off
+
+[credential]
+    helper = store
+
+[delta]
+    plus-style = "syntax #012800"
+    minus-style = "syntax #340001"
+    syntax-theme = Monokai Extended
+    navigate = true
+    features = decorations
+    light = false
+    side-by-side = true
+
+[delta "decorations"]
+    syntax-theme = Dracula
+    commit-decoration-style = blue ol
+    commit-style = raw
+    file-style = omit
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+
+[delta "interactive"]
+    keep-plus-minus-markers = false
+
+[filter "lfs"]
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+
+[http]
+    sslVerify = false
+
+[interactive]
+    diffFilter = delta --color-only --features=interactive
+
+[push]
+    default = simple
+
+[pager]
+    diff = delta
+    log = delta
+    reflog = delta
+    show = delta
+
+[alias]
+    co = checkout
+    ci = commit
+    rb = rebase -i
+    st = status
+    pl = pull
+    ps = push
+    l = log --graph --abbrev-commit --decorate --format=format:'%C(cyan)%h%C(reset) - %C(green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(yellow)%d%C(reset)' --all
+    ad = add
+    tg = tag -n
+    d = diff
+    dt = difftool
+    mt = mergetool
+    br = branch
+    b0 = "!git branch | awk '/^\\*/{print $2}'"
+    back = "!git branch backup-`git b0`"
+    a = "!git add $(git status -s | fzf -m | awk '{print $2}')"
+    alias = "!# Prints all aliases.;\n\
+        git config --list \
+        | egrep '^alias.+' \
+        | sed -e 's/^alias\\.//' \
+        | sed -e 's/^[^=]*=/\\'$'\\033[31m&\\033[(B\\033[m/' \
+        | column -t -s'=' \
+        | sed 's/!#* *//; s/;$//' \
+        | cut -c1-85 \
+    "
+    bb = "! # Branch tools. Type 'git bb help' ; \n\
+        f() { \n\
+            if [ $# = 0 ]; then \
+                git checkout $(git branch -vv | grep -v '^\\*' | fzf | awk '{print $1}'); \
+            elif [ $1 = 'help' ]; then \
+                echo 'git bb           : Select and checkout branch'; \
+                echo 'git bb c, clean  : Clean all merged branches'; \
+                echo 'git bb d, D      : Delete seleted branches(D: force)'; \
+                echo 'git bb l, list   : List branches excluding the current branch'; \
+                echo 'git bb m, merged : List merged branches excluding the current and master branches'; \
+            elif [ $1 = 'd' -o $1 = 'D' ]; then \
+                git branch -$1 $(git bb list | fzf -m); \
+            elif [ $1 = 'clean' -o $1 = 'c' ]; then \
+                git branch -d $(git bb merged); \
+            elif [ $1 = 'list' -o $1 = 'l' ]; then \
+                git branch | grep -v '^\\*'; \
+            elif [ $1 = 'merged' -o $1 = 'm' ]; then \
+                git branch --merged | grep -v '^\\*\\|\\<master$'; \
+            else \
+                git bb help; \
+            fi; \
+        }; f"
+    blist = "!git branch | grep -v '^\\*'"
+    blist-merged = "!git branch --merged | grep -v '^\\*\\|\\<master$'"
+    bclean = "! # Search and delete merged branches;\n\
+      git branch -d $(git blist-merged); \
+      for branch in $(git blist) ; do \
+          echo \"\nSearch :\\033[32m $branch \\033[0m\"; \
+          if [ $(git l | grep $branch -c) -gt 0 ]; then \
+              git l | egrep \"Merge.*$branch\" -C 2; \
+              read -p \"Delete $branch? [y|n] \" -r; \
+              REPLY=${REPLY:-"n"}; \
+              if [ $REPLY = \"y\" ]; then \
+                  git branch -D $branch; \
+                  echo \"\\033[32m$branch \\033[0mhas been\\033[31m deleted\\033[0m.\n\"; \
+              fi; \
+          fi; \
+      done \n\
+    "
+    ch = "!git checkout $(git bselect)"
+    bselect = "! # select branch with preview; \n\
+        f() { \
+            _height=$(stty size | awk '{print $1}');\
+            git branch | egrep -v '^\\*' | fzf --preview \"git l {1} | head -n $_height\"; \
+        }; f"
+    diff-select = "! # add files with fzf preview diffs; \n\
+        f() { \
+            _height=$(stty size | awk '{print $1}');\
+            git diff-info \
+            | fzf -m --header \"$(git diff --shortstat)\" --preview \
+                \"if [[ {1} == '??' ]]; then cat {3}; else git diff {3}; fi \
+                | head -n $_height \
+                | pygmentize\" \
+            | awk '{print $3}'; \
+        }; f"
+    diff-info = "! # get diff info;\n\
+        fileA=/tmp/git-s-$(uuidgen); \
+        fileB=/tmp/git-diff-$(uuidgen); \
+        git s | awk '{print $2,$1}' > $fileA; \
+        git diff --numstat | awk '{print $3,$1,$2}' > $fileB; \
+        join -t' ' -a 1 $fileA $fileB | awk '{print $2, \"(+\"$3 \",-\"$4\")\", $1}' | sed 's/(+,-)/./' | column -t -s' ' ; \
+        rm -f $fileA $fileB; \
+    "
+
+[diff]
+    colorMoved = default
+#    tool = vimdiff
+#    tool = bc4
+#    tool = bc # Mac
+
+[difftool]
+    prompt = false
+
+[merge]
+    conflictstyle = diff3
+#    tool = vimdiff
+#    tool = bc4
+#    tool = bc # Mac
+
+[mergetool]
+    prompt = false

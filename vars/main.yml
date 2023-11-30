@@ -1,0 +1,6 @@
+---
+jenkins_home: "{{ app_home_dir }}/jenkins-docker"
+jenkins_data: "{{ app_data_dir }}/jenkins_home"
+jenkins_git_user: Jenkins
+jenkins_git_email: manager@devops.com
+extra_hosts: ["devops.com:10.11.22.33"]

@@ -1,0 +1,15 @@
+- name: Start jenkins
+  ansible.builtin.command: "{{ docker_compose_bin }} up --detach"
+  args:
+    chdir: "{{ jenkins_home }}"
+  register: result
+  changed_when: result.changed
+
+- name: Restart jenkins
+  ansible.builtin.shell:
+    "{{ docker_compose_bin }} down; {{ docker_compose_bin }} up --detach"
+  args:
+    chdir: "{{ jenkins_home }}"
+  register: result
+  changed_when: result.changed
+  ignore_errors: true

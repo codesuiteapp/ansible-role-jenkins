@@ -1,0 +1,64 @@
+# code: language=ansible
+---
+- name: Check if the group exists
+  ansible.builtin.getent:
+    database: group
+    key: "{{ adm_group }}"
+  register: group_exists
+  ignore_errors: true
+  when: create_user
+
+- name: Add group
+  ansible.builtin.group:
+    name: "{{ adm_group }}"
+    state: present
+    # gid: ""
+  when: not group_exists and create_user
+  register: result
+
+- name: Check if the user exists
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ adm_user }}"
+  register: user_exists
+  ignore_errors: true
+  when: adm_user != 'root'
+
+- name: Add user
+  ansible.builtin.user:
+    name: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    # uid: "{{ adm_uid }}"
+  when: not user_exists and create_user
+  register: result
+
+- name: Print variables
+  ansible.builtin.debug:
+    var: result
+
+- name: Change password of the {{ adm_user }}
+  ansible.builtin.user:
+    name: "{{ adm_user }}"
+    password: "{{ passwd_adm_user | password_hash('sha512') }}" # aval-passwd.yml
+  when: adm_user != 'root'
+  register: result
+
+- name: Print variables
+  ansible.builtin.debug:
+    var: result
+
+- name: Add sudoers.d
+  ansible.builtin.copy:
+    content: |
+      {{ adm_user }} ALL=(ALL) NOPASSWD: ALL
+    dest: "/etc/sudoers.d/{{ adm_user }}"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: "/usr/sbin/visudo -c -f '%s'"
+  when: adm_user != 'root' and not result.failed
+  register: result
+
+- name: Print variables
+  ansible.builtin.debug:
+    var: result

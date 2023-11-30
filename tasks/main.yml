@@ -1,0 +1,63 @@
+---
+- name: Create User
+  include_tasks: "user.yml"
+
+- name: Creates directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0775'
+    force: false
+  with_items:
+    - "{{ app_home_dir }}"
+    - "{{ jenkins_home }}"
+    - "{{ jenkins_data }}"
+
+- name: Create docker network
+  community.docker.docker_network:
+    name: "{{ dkr_network }}"
+    driver: bridge
+    state: present
+  register: result
+  when: use_dkr_net
+
+- name: Print variables
+  ansible.builtin.debug:
+    var: result
+
+- name: Install Docker SDK for Python
+  ansible.builtin.pip:
+    name: docker
+    state: present
+  when: ansible_pkg_mgr != "pacman"
+  ignore_errors: true
+
+- name: Log into docker server
+  community.docker.docker_login:
+    # registry_url: "{{ image_registry_server }}"
+    username: "{{ dkr_username }}"
+    password: "{{ dkr_passwd }}"
+    reauthorize: true
+  when: docker_type != 'ghcr.io'
+
+- name: Login to docker [ghcr.io]
+  ansible.builtin.shell: echo {{ dkr_passwd }} | docker login ghcr.io -u {{ dkr_username }} --password-stdin
+  when: docker_type == 'ghcr.io'
+
+- name: Copy file from template
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0644'
+    backup: true
+  with_items:
+    - { src: '.env.j2', dest: '{{ jenkins_home }}/.env' }
+    - { src: 'docker-compose.yml.j2', dest: '{{ jenkins_home }}/docker-compose.yml' }
+    - { src: 'gitconfig.j2', dest: '{{ jenkins_home }}/gitconfig' }
+    - { src: 'settings.xml.j2', dest: '{{ jenkins_home }}/settings.xml' }
+  notify:
+    Restart jenkins
