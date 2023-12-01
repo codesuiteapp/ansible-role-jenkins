@@ -14,6 +14,7 @@
   with_items:
     - "{{ app_home_dir }}"
     - "{{ jenkins_home }}"
+    - "{{ jenkins_home }}/casc_config"
     - "{{ jenkins_data }}"
 
 - name: Create docker network
