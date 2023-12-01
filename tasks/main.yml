@@ -48,7 +48,7 @@
   ansible.builtin.shell: echo {{ dkr_passwd }} | docker login ghcr.io -u {{ dkr_username }} --password-stdin
   when: docker_type == 'ghcr.io'
 
-- name: Copy file from template
+- name: Copy file
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
