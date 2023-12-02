@@ -1,8 +1,4 @@
 ---
-- name: Create User
-  include_role:
-    name: "codesuiteapp.user"
-
 - name: Creates directory
   ansible.builtin.file:
     path: "{{ item }}"
