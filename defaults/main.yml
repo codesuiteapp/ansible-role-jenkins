@@ -7,6 +7,8 @@ jenkins_port: 9753
 docker_type: ghcr.io
 docker_compose_bin: "docker-compose"
 use_dkr_net: false
+use_traefik: false
+use_traefik_tls: false
 dkr_network: devops_net
 use_extra_hosts: false
 add_etc_host: "10.11.22.10   devops.com"
