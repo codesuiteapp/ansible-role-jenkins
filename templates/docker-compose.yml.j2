@@ -27,7 +27,7 @@ services:
       - ./gitconfig:/root/.gitconfig
       - ./settings.xml:/root/.m2/settings.xml
       - {{ jenkins_data }}:/var/jenkins_home
-      - {{ jenkins_data }}/casc_config:/var/jenkins_home/casc_configs
+      - {{ jenkins_data }}/casc_configs:/var/jenkins_home/casc_configs
       - {{ nexus_data }}:/appdata/m2/repository
       - /bin/docker:/bin/docker
       - /var/run/docker.sock:/var/run/docker.sock
