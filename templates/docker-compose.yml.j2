@@ -38,7 +38,7 @@ services:
 {% endif %}
       - {{ jenkins_data }}:/var/jenkins_home
       - {{ jenkins_data }}/casc_configs:/var/jenkins_home/casc_configs
-      - {{ nexus_data }}:/appdata/m2/repository
+      - {{ nexus_data }}:{{ nexus_data }}
       - /bin/docker:/bin/docker
       - /var/run/docker.sock:/var/run/docker.sock
       # - /usr/local/bin/kubectl:/usr/local/bin/kubectl
