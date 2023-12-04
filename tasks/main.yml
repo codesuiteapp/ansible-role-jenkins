@@ -17,13 +17,65 @@
     state: directory
     owner: "{{ adm_user }}"
     group: "{{ adm_group }}"
-    mode: '0775'
+    mode: '0755'
     force: false
   with_items:
     - "{{ app_home_dir }}"
     - "{{ jenkins_home }}"
     - "{{ jenkins_home }}/casc_configs"
     - "{{ jenkins_data }}"
+
+- name: Creates argocd directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0755'
+    force: false
+  with_items:
+    - "{{ jenkins_home }}/argocd/"
+  when: use_argocd
+
+- name: Touch argocd config
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: file
+    mode: '0600'
+  with_items:
+    - "{{ jenkins_home }}/argocd/config"
+  when: use_argocd
+
+- name: Touch kubeconfig
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: file
+    mode: '0600'
+  with_items:
+    - "{{ jenkins_home }}/kubeconfig"
+  when: use_kubeconfig
+
+- name: Creates ssh directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0755'
+    force: false
+  with_items:
+    - "{{ jenkins_home }}/.ssh/"
+  when: use_ssh
+
+- name: Touch .ssh files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: file
+    mode: '0600'
+  with_items:
+    - "{{ jenkins_home }}/.ssh/id_rsa"
+    - "{{ jenkins_home }}/.ssh/id_rsa.pub"
+  when: use_ssh
 
 - name: Install Docker SDK for Python
   ansible.builtin.pip:
