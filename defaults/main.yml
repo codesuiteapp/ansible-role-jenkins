@@ -1,5 +1,6 @@
 ---
 image_registry_server: "ghcr.io/codesuiteapp"
+image_registry_server2: "sample"
 jenkins_image: "jenkins-docker"
 jenkins_ver: "latest"
 jenkins_port: 9753

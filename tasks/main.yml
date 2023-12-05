@@ -109,5 +109,17 @@
     - { src: 'docker-compose.yml.j2', dest: '{{ jenkins_home }}/docker-compose.yml' }
     - { src: 'gitconfig.j2', dest: '{{ jenkins_home }}/gitconfig' }
     - { src: 'settings.xml.j2', dest: '{{ jenkins_home }}/settings.xml' }
-  notify:
-    Restart jenkins
+
+- name: Pull jenkins image
+  community.docker.docker_image:
+    name: "{{ image_registry_server }}/{{ jenkins_image }}:{{ jenkins_ver }}"
+    source: pull
+    pull:
+      platform: amd64
+
+- name: Tag jenkins image
+  community.docker.docker_image:
+    name: "{{ image_registry_server }}/{{ jenkins_image }}:{{ jenkins_ver }}"
+    repository: "{{ image_registry_server2 }}/{{ jenkins_image }}:{{ jenkins_ver }}"
+    push: false
+    source: local
