@@ -17,10 +17,13 @@ add_etc_host: "10.11.22.10   devops.com"
 use_ssh: false
 use_kubeconfig: false
 use_argocd: false
+use_flyway: false
 
 app_home_dir: /app
 app_data_dir: /data
 nexus_data: "{{ app_data_dir }}/m2/repository"
+flyway_data: "{{ app_data_dir }}/flyway"
+flyway_data_kos: "{{ app_data_dir }}/flyway-kos"
 
 create_user: false
 adm_user: "appadm"

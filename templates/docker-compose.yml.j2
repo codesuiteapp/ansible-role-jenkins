@@ -37,6 +37,11 @@ services:
       - ./.ssh/id_rsa:/root/.ssh/id_rsa
       - ./.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
 {% endif %}
+{% if use_flyway %}
+      - {{ flyway_data }}:{{ flyway_data }}
+      - {{ flyway_data_kos }}:{{ flyway_data_kos }}
+{% endif %}
+      - ./kubeconfig:/root/.kube/config
       - {{ jenkins_data }}:/var/jenkins_home
       - {{ jenkins_data }}/casc_configs:/var/jenkins_home/casc_configs
       - {{ nexus_data }}:{{ nexus_data }}

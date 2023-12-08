@@ -25,6 +25,19 @@
     - "{{ jenkins_home }}/casc_configs"
     - "{{ jenkins_data }}"
 
+- name: Creates directory for Flyway
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0644'
+    force: false
+  with_items:
+    - "{{ flyway_data }}"
+    - "{{ flyway_data_kos }}"
+  when: use_flyway
+
 - name: Creates argocd directory
   ansible.builtin.file:
     path: "{{ item }}"
