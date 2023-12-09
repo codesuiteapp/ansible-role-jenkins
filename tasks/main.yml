@@ -90,6 +90,20 @@
     - "{{ jenkins_home }}/.ssh/id_rsa.pub"
   when: use_ssh
 
+- name: Copy file
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0644'
+    backup: true
+  with_items:
+    - { src: '.env.j2', dest: '{{ jenkins_home }}/.env' }
+    - { src: 'docker-compose.yml.j2', dest: '{{ jenkins_home }}/docker-compose.yml' }
+    - { src: 'gitconfig.j2', dest: '{{ jenkins_home }}/gitconfig' }
+    - { src: 'settings.xml.j2', dest: '{{ jenkins_home }}/settings.xml' }
+
 - name: Install Docker SDK for Python
   ansible.builtin.pip:
     name: docker
@@ -109,30 +123,18 @@
   ansible.builtin.shell: echo {{ dkr_passwd }} | docker login ghcr.io -u {{ dkr_username }} --password-stdin
   when: docker_type == 'ghcr.io'
 
-- name: Copy file
-  ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: "{{ adm_user }}"
-    group: "{{ adm_group }}"
-    mode: '0644'
-    backup: true
-  with_items:
-    - { src: '.env.j2', dest: '{{ jenkins_home }}/.env' }
-    - { src: 'docker-compose.yml.j2', dest: '{{ jenkins_home }}/docker-compose.yml' }
-    - { src: 'gitconfig.j2', dest: '{{ jenkins_home }}/gitconfig' }
-    - { src: 'settings.xml.j2', dest: '{{ jenkins_home }}/settings.xml' }
-
-- name: Pull jenkins image
+- name: Pull jenkins image from {{ image_registry_server }}
   community.docker.docker_image:
     name: "{{ image_registry_server }}/{{ jenkins_image }}:{{ jenkins_ver }}"
     source: pull
     pull:
       platform: amd64
+  when: image_registry_server2
 
 - name: Tag jenkins image
   community.docker.docker_image:
     name: "{{ image_registry_server }}/{{ jenkins_image }}:{{ jenkins_ver }}"
     repository: "{{ image_registry_server2 }}/{{ jenkins_image }}:{{ jenkins_ver }}"
-    push: false
+    push: "{{ push_image }}"
     source: local
+  when: image_registry_server2

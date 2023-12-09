@@ -25,22 +25,22 @@ services:
       - "9090:9090"
       - "50000:50000"
     volumes:
-      - ./gitconfig:/root/.gitconfig
-      - ./settings.xml:/root/.m2/settings.xml
-{% if use_kubeconfig %}
-      - ./kubeconfig:/root/.kube/config
+{% if use_flyway %}
+      - {{ flyway_data }}:{{ flyway_data }}
+      - {{ flyway_data_kos }}:{{ flyway_data_kos }}
 {% endif %}
 {% if use_argocd %}
       - ./argocd/config:/root/.config/argocd/config
+{% endif %}
+{% if use_kubeconfig %}
+      - ./kubeconfig:/root/.kube/config
 {% endif %}
 {% if use_ssh %}
       - ./.ssh/id_rsa:/root/.ssh/id_rsa
       - ./.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
 {% endif %}
-{% if use_flyway %}
-      - {{ flyway_data }}:{{ flyway_data }}
-      - {{ flyway_data_kos }}:{{ flyway_data_kos }}
-{% endif %}
+      - ./gitconfig:/root/.gitconfig
+      - ./settings.xml:/root/.m2/settings.xml
       - {{ jenkins_data }}:/var/jenkins_home
       - {{ jenkins_data }}/casc_configs:/var/jenkins_home/casc_configs
       - {{ nexus_data }}:{{ nexus_data }}
