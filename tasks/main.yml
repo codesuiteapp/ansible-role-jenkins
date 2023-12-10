@@ -126,3 +126,8 @@
     push: "{{ push_image }}"
     source: local
   when: image_registry_server2
+
+- name: Restart jenkins
+  shell: echo success
+  notify:
+    Restart jenkins
