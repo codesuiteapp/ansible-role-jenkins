@@ -1,16 +1,4 @@
 ---
-- name: Create docker network
-  community.docker.docker_network:
-    name: "{{ dkr_network }}"
-    driver: bridge
-    state: present
-  register: result
-  when: use_dkr_net
-
-- name: Print variables
-  ansible.builtin.debug:
-    var: result
-
 - name: Creates directory
   ansible.builtin.file:
     path: "{{ item }}"
