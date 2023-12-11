@@ -8,6 +8,7 @@ jenkins_port: 9753
 docker_type: ghcr.io
 docker_compose_bin: "docker-compose"
 use_dkr_net: false
+pull_image: false
 push_image: false
 use_traefik: false
 use_traefik_tls: false

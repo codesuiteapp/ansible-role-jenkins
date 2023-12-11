@@ -117,7 +117,7 @@
     source: pull
     pull:
       platform: amd64
-  when: image_registry_server2
+  when: image_registry_server2 and pull_image
 
 - name: Tag jenkins image
   community.docker.docker_image:
@@ -125,7 +125,8 @@
     repository: "{{ image_registry_server2 }}/{{ jenkins_image }}:{{ jenkins_ver }}"
     push: "{{ push_image }}"
     source: local
-  when: image_registry_server2
+  when: image_registry_server2 and pull_image
+  ignore_errors: true
 
 - name: Restart jenkins
   ansible.builtin.shell: echo success

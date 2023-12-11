@@ -26,8 +26,7 @@ services:
       - "50000:50000"
     volumes:
 {% if use_flyway %}
-      - {{ flyway_data }}:{{ flyway_data }}
-      - {{ flyway_data_kos }}:{{ flyway_data_kos }}
+      - /data:/data
 {% endif %}
 {% if use_argocd %}
       - ./argocd/config:/root/.config/argocd/config
