@@ -20,6 +20,8 @@ use_ssh: false
 use_kubeconfig: false
 use_argocd: false
 use_flyway: false
+use_aws: false
+env_profile: "dev"
 
 app_home_dir: /app
 app_data_dir: /data

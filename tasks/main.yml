@@ -26,6 +26,48 @@
     - "{{ flyway_data_kos }}"
   when: use_flyway
 
+- name: Creates aws directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adm_user }}"
+    group: "{{ adm_group }}"
+    mode: '0640'
+    force: false
+  with_items:
+    - "{{ jenkins_home }}/.aws/"
+  when: use_aws
+
+- name: Touch AWS Config
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}/.aws/config"
+    state: touch
+
+- name: Copy file with ssh
+  ansible.builtin.blockinfile:
+    path: "{{ jenkins_home }}/.aws/config"
+    block: |
+      [profile {{ aws_profile }}]
+      region = ap-northeast-2
+      output = json
+  register: result
+
+- name: Touch AWS Credentials
+  ansible.builtin.file:
+    path: "{{ jenkins_home }}/.aws/credentials"
+    state: touch
+  when: access_key and secret_access_key
+
+- name: Add AWS Credentials
+  ansible.builtin.blockinfile:
+    path: "{{ jenkins_home }}/.aws/credentials"
+    block: |
+      [{{ aws_profile }}]
+      aws_access_key_id = {{ access_key }}
+      aws_secret_access_key = {{ secret_access_key }}
+  when: access_key and secret_access_key
+  register: result
+
 - name: Creates argocd directory
   ansible.builtin.file:
     path: "{{ item }}"

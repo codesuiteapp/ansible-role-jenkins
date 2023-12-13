@@ -34,6 +34,9 @@ services:
 {% if use_kubeconfig %}
       - ./kubeconfig:/root/.kube/config
 {% endif %}
+{% if use_aws %}
+      - ./.aws:/root/.aws
+{% endif %}
 {% if use_ssh %}
       - ./.ssh/id_rsa:/root/.ssh/id_rsa
       - ./.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
