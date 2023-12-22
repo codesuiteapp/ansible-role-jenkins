@@ -167,8 +167,13 @@
     repository: "{{ image_registry_server2 }}/{{ jenkins_image }}:{{ jenkins_ver }}"
     push: "{{ push_image }}"
     source: local
-  when: image_registry_server2 and pull_image
+  when: image_registry_server2 and tag_image
+  register: result
   ignore_errors: true
+
+- name: Print variables
+  ansible.builtin.debug:
+    var: result
 
 - name: Restart jenkins
   ansible.builtin.shell: echo success
