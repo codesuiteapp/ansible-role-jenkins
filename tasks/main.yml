@@ -159,7 +159,7 @@
     source: pull
     pull:
       platform: amd64
-  when: image_registry_server2 and pull_image
+  when: image_registry_server2
 
 - name: Tag jenkins image
   community.docker.docker_image:
