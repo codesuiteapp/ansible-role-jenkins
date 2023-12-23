@@ -16,9 +16,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.jenkins.entrypoints=web,websecure"
       - "traefik.http.routers.jenkins.rule=Host(`${trf_domain}`) && PathPrefix(`/jenkins`)"
-    {% if use_traefik_tls %}
+{% endif %}
+{% if use_traefik and use_traefik_tls %}
       - "traefik.http.routers.jenkins.tls=true"
-    {% endif %}
 {% endif %}
     ports:
       - "{{ jenkins_port }}:8080"
