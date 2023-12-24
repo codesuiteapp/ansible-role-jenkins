@@ -29,27 +29,27 @@ services:
       - /data:/data
 {% endif %}
 {% if use_argocd %}
-      - ./argocd/config:/root/.config/argocd/config
-{% endif %}
-{% if use_kubeconfig %}
-      - ./kubeconfig:/root/.kube/config
+      - {{ jenkins_home }}/argocd/config:/root/.config/argocd/config
 {% endif %}
 {% if use_aws %}
-      - ./.aws:/root/.aws
+      - {{ jenkins_home }}/.aws:/root/.aws
+{% endif %}
+{% if use_kubeconfig %}
+      - {{ jenkins_home }}/kubeconfig:/root/.kube/config
 {% endif %}
 {% if use_ssh %}
-      - ./.ssh/id_rsa:/root/.ssh/id_rsa
-      - ./.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
+      - {{ jenkins_home }}/.ssh/id_rsa:/root/.ssh/id_rsa
+      - {{ jenkins_home }}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
 {% endif %}
-      - ./gitconfig:/root/.gitconfig
-      - ./settings.xml:/root/.m2/settings.xml
+      - {{ jenkins_home }}/gitconfig:/root/.gitconfig
+      - {{ jenkins_home }}/settings.xml:/root/.m2/settings.xml
       - {{ jenkins_data }}:/var/jenkins_home
       - {{ jenkins_data }}/casc_configs:/var/jenkins_home/casc_configs
       - {{ nexus_data }}:{{ nexus_data }}
       - /bin/docker:/bin/docker
       - /var/run/docker.sock:/var/run/docker.sock
-      # - /usr/bin/docker-compose:/usr/bin/docker-compose
       # - /usr/local/bin/kubectl:/usr/local/bin/kubectl
+      # - /usr/bin/docker-compose:/usr/bin/docker-compose
       # - /usr/local/bin/argocd:/usr/local/bin/argocd
     restart: unless-stopped
     tty: true
