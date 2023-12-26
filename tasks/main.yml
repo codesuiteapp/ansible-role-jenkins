@@ -56,16 +56,16 @@
   ansible.builtin.file:
     path: "{{ jenkins_home }}/.aws/credentials"
     state: touch
-  when: access_key and secret_access_key
+  when: enc_access_key and enc_secret_access_key
 
 - name: Add AWS Credentials
   ansible.builtin.blockinfile:
     path: "{{ jenkins_home }}/.aws/credentials"
     block: |
       [{{ aws_profile }}]
-      aws_access_key_id = {{ access_key }}
-      aws_secret_access_key = {{ secret_access_key }}
-  when: access_key and secret_access_key
+      aws_access_key_id = {{ enc_access_key }}
+      aws_secret_access_key = {{ enc_secret_access_key }}
+  when: enc_access_key and enc_secret_access_key
   register: result
 
 - name: Creates argocd directory
