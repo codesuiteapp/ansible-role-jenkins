@@ -11,14 +11,24 @@ services:
       - JAVA_OPTS="-Djava.awt.headless=true -Dcom.sun.akuma.Daemon=daemonized"
       # - JAVA_OPTS="-Djava.awt.headless=true -Dcom.sun.akuma.Daemon=daemonized -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/jenkins.yml"
       - TZ=Asia/Seoul
-{% if use_traefik %}
     labels:
+{% if use_traefik %}
       - "traefik.enable=true"
       - "traefik.http.routers.jenkins.entrypoints=web,websecure"
       - "traefik.http.routers.jenkins.rule=Host(`${trf_domain}`) && PathPrefix(`/jenkins`)"
 {% endif %}
 {% if use_traefik and use_traefik_tls %}
       - "traefik.http.routers.jenkins.tls=true"
+{% endif %}
+{% if use_flame %}
+      - "flame.type=application"
+      - "flame.name=jenkins"
+{% if use_traefik %}
+      - "flame.url=http://{{ traefik_domain }}:{{ traefik_http_port }}"
+{% endif %}
+{% if not use_traefik %}
+      - "flame.url=http://{{ jenkins_host}}:{{ jenkins_port }}"
+{% endif %}
 {% endif %}
     ports:
       - "{{ jenkins_port }}:8080"

@@ -12,6 +12,7 @@ pull_image: false
 tag_image: true
 push_image: false
 use_traefik: false
+traefik_http_port: 8080
 use_traefik_tls: false
 dkr_network: devops_net
 use_extra_hosts: false
