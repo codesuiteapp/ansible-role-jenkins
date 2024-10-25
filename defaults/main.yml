@@ -1,9 +1,9 @@
 ---
 image_registry_server: "ghcr.io/codesuiteapp"
-image_registry_server2: "sample"
+image_registry_server2: "devops"
 jenkins_image: "jenkins-docker"
 jenkins_ver: "latest"
-jenkins_port: 9753
+jenkins_port: 9876
 
 docker_type: ghcr.io
 docker_compose_bin: "docker-compose"
