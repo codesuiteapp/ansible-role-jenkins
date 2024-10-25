@@ -1,74 +1,63 @@
 ---
-- name: Creates directory
+- name: Create directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ adm_user }}"
     group: "{{ adm_group }}"
     mode: '0755'
-    force: false
-  with_items:
+  loop:
     - "{{ app_home_dir }}"
     - "{{ jenkins_home }}"
     - "{{ jenkins_home }}/casc_configs"
     - "{{ jenkins_data }}"
 
-- name: Creates directory for Flyway
+- name: Create directories for Flyway
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ adm_user }}"
     group: "{{ adm_group }}"
-    mode: '0644'
-    force: false
-  with_items:
+    mode: '0755'
+  loop:
     - "{{ flyway_data }}"
     - "{{ flyway_data_kos }}"
-  when: use_flyway
+  when: use_flyway | bool
 
-- name: Creates aws directory
+- name: Create AWS directory
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ adm_user }}"
     group: "{{ adm_group }}"
-    mode: '0640'
-    force: false
-  with_items:
+    mode: '0700'
+  loop:
     - "{{ jenkins_home }}/.aws/"
   when: use_aws
 
-- name: Touch AWS Config
-  ansible.builtin.file:
-    path: "{{ jenkins_home }}/.aws/config"
-    state: touch
-
-- name: Copy file with ssh
+- name: Create and populate AWS Config file
   ansible.builtin.blockinfile:
     path: "{{ jenkins_home }}/.aws/config"
+    create: yes
+    mode: '0600'
     block: |
       [profile {{ aws_profile }}]
       region = ap-northeast-2
       output = json
   register: result
 
-- name: Touch AWS Credentials
-  ansible.builtin.file:
-    path: "{{ jenkins_home }}/.aws/credentials"
-    state: touch
-  when: enc_access_key and enc_secret_access_key
-
-- name: Add AWS Credentials
+- name: Create and populate AWS Credentials file
   ansible.builtin.blockinfile:
     path: "{{ jenkins_home }}/.aws/credentials"
+    create: yes
+    mode: '0600'
     block: |
       [{{ aws_profile }}]
       aws_access_key_id = {{ enc_access_key }}
       aws_secret_access_key = {{ enc_secret_access_key }}
-  when: enc_access_key and enc_secret_access_key
-  register: result
+  when: enc_access_key is defined and enc_secret_access_key is defined
 
-- name: Creates argocd directory
+- name: Create ArgoCD directory
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -76,51 +65,50 @@
     group: "{{ adm_group }}"
     mode: '0755'
     force: false
-  with_items:
+  loop:
     - "{{ jenkins_home }}/argocd/"
-  when: use_argocd
+  when: use_argocd | bool
 
-- name: Touch argocd config
+- name: Create ArgoCD config file
   ansible.builtin.file:
     path: "{{ item }}"
     state: touch
     mode: '0600'
-  with_items:
+  loop:
     - "{{ jenkins_home }}/argocd/config"
-  when: use_argocd
+  when: use_argocd | bool
 
-- name: Touch kubeconfig
+- name: Create Kubeconfig file
   ansible.builtin.file:
     path: "{{ item }}"
     state: touch
     mode: '0600'
-  with_items:
+  loop:
     - "{{ jenkins_home }}/kubeconfig"
-  when: use_kubeconfig
+  when: use_kubeconfig | bool
 
-- name: Creates ssh directory
+- name: Create SSH directory
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ adm_user }}"
     group: "{{ adm_group }}"
-    mode: '0755'
-    force: false
-  with_items:
+    mode: '0700'
+  loop:
     - "{{ jenkins_home }}/.ssh/"
-  when: use_ssh
+  when: use_ssh | bool
 
-- name: Touch .ssh files
+- name: Create SSH key files
   ansible.builtin.file:
     path: "{{ item }}"
     state: touch
     mode: '0600'
-  with_items:
+  loop:
     - "{{ jenkins_home }}/.ssh/id_rsa"
     - "{{ jenkins_home }}/.ssh/id_rsa.pub"
-  when: use_ssh
+  when: use_ssh | bool
 
-- name: Copy file
+- name: Copy files
   ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -128,7 +116,7 @@
     group: "{{ adm_group }}"
     mode: '0644'
     backup: true
-  with_items:
+  loop:
     - { src: '.env.j2', dest: '{{ jenkins_home }}/.env' }
     - { src: 'docker-compose.yml.j2', dest: '{{ jenkins_home }}/docker-compose.yml' }
     - { src: 'gitconfig.j2', dest: '{{ jenkins_home }}/gitconfig' }
@@ -159,15 +147,17 @@
     source: pull
     pull:
       platform: amd64
-  when: image_registry_server2
+  when: image_registry_server2 is defined
 
 - name: Tag jenkins image
   community.docker.docker_image:
     name: "{{ image_registry_server }}/{{ jenkins_image }}:{{ jenkins_ver }}"
     repository: "{{ image_registry_server2 }}/{{ jenkins_image }}:{{ jenkins_ver }}"
-    push: "{{ push_image }}"
+    push: "{{ push_image | bool }}"
     source: local
-  when: image_registry_server2 and tag_image
+  when:
+    - image_registry_server2 is defined
+    - tag_image | bool
   register: result
   ignore_errors: true
 
@@ -176,6 +166,5 @@
     var: result
 
 - name: Restart jenkins
-  ansible.builtin.shell: echo success
-  notify:
-    Restart jenkins
+  ansible.builtin.meta: flush_handlers
+  notify: Restart jenkins
