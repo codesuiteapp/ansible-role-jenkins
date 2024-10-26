@@ -26,7 +26,7 @@ services:
       - "flame.url=http://{{ traefik_domain }}:{{ traefik_http_port }}"
 {% endif %}
 {% if not use_traefik %}
-      - "flame.url=http://{{ jenkins_host}}:{{ jenkins_port }}"
+      - "flame.url=http://{{ jenkins_host }}:{{ jenkins_port }}"
 {% endif %}
 {% endif %}
     ports:
