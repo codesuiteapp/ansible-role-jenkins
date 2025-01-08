@@ -1,6 +1,6 @@
 ---
 - name: Start jenkins
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ jenkins_home }}"
     files:
       - docker-compose.yml
@@ -18,7 +18,7 @@
   changed_when: shell_result.rc == 0
 
 - name: Stop jenkins
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ jenkins_home }}"
     files:
       - docker-compose.yml
@@ -36,7 +36,7 @@
   changed_when: shell_result.rc == 0
 
 - name: Restart jenkins
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ jenkins_home }}"
     files:
       - docker-compose.yml
